@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCQ Generator and QA System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <header>
+        <h1>MCQ Generator and QA System</h1>
+    </header>
+
+    <div class="container">
+        <div class="form-container">
+            <form method="POST">
+                <label for="context">Enter the context (text) based on which MCQs will be generated:</label><br>
+                <textarea id="context" name="context" rows="6" cols="60">{{ request.form.get('context', '') }}</textarea><br><br>
+
+                <label for="num_questions">How many MCQs do you want to generate?</label><br>
+                <input type="number" id="num_questions" name="num_questions" min="1" max="10" value="{{ request.form.get('num_questions', 1) }}"><br><br>
+
+                <input type="submit" name="generate_mcqs" value="Generate MCQs">
+            </form>
+
+            <form method="POST">
+                <label for="question">Enter a question to get an answer based on the context above:</label><br>
+                <textarea id="question" name="question" rows="2" cols="60">{{ request.form.get('question', '') }}</textarea><br><br>
+
+                <input type="submit" name="answer_question" value="Get Answer">
+            </form>
+        </div>
+
+        <div class="results-container">
+            {% if mcqs %}
+                <h2>Generated MCQs:</h2>
+                {% for mcq in mcqs %}
+                    <p><strong>Q{{ loop.index }}: {{ mcq['question'] }}</strong></p>
+                    <ul>
+                        {% for option in mcq['options'] %}
+                            <li>{{ index_to_letter(loop.index0) }}. {{ option }}</li>
+                        {% endfor %}
+                    </ul>
+                    <p><em>Answer: {{ mcq['answer'] }}</em></p>
+                {% endfor %}
+            {% endif %}
+
+            {% if answer %}
+                <h2>Answer:</h2>
+                <p>{{ answer }}</p>
+            {% endif %}
+
+            {% if error %}
+                <p style="color: red;">{{ error }}</p>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
